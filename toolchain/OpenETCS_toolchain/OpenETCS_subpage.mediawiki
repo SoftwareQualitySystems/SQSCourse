@@ -27,7 +27,7 @@
 
 [[Image:Example.jpg|Girasoles]]
 
-
+This is a page for testing tasks
 
 [[Media:https://raw.github.com/openETCS/toolchain/master/tool/documentation-artwork/icons/lamp.png]]
 
@@ -36,7 +36,9 @@
 
 <span class="plainlinks">[https://raw.github.com/openETCS/toolchain/master/tool/documentation-artwork/icons/alert.png https://raw.github.com/openETCS/toolchain/master/tool/documentation-artwork/icons/alert.png]</span>
 
-
+<html>
+<nowiki>
+<img src="https://raw.github.com/openETCS/toolchain/master/tool/documentation-artwork/icons/alert.png"/></nowiki></html>
 
 == FAQ ==
 
