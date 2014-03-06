@@ -27,7 +27,7 @@
 
 [[Image:Example.jpg|Girasoles]]
 
-[[Documentation_Annex|Simon Brown]]
+
 
 [[Media:https://raw.github.com/openETCS/toolchain/master/tool/documentation-artwork/icons/lamp.png]]
 
