@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.help.toc">
+     
+         <!--
+         <toc>
+         <exclude>OpenETCS_toolchain/*.xml</exclude>
+         </toc>-->
+          <echo message="HOLA"/>
+      <toc
+            file="OpenETCS_toolchain/OpenETCS_Toolchain_Documentation-toc.xml"
+            primary="true" />
+      
+      <toc
+            file="OpenETCS_toolchain/OpenETCS_subpage-toc.xml"
+            primary="true" />      
+   </extension>
+   
+   
+
+</plugin>
+

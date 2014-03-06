@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+    Copyright (c) 2014 SQS S.A.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+
+    -->
+
+<project name="toolchain" default="all">
+    <description>
+            Generate Eclipse help content from the Eclipsepedia wiki
+    </description>
+
+	<!--<property name="help.doc.url.base" value="https://github.com/openETCS/toolchain/wiki"/>-->
+	<!--<property name="wiki.url.base" value="${help.doc.url.base}/OpenETCS_toolchain"/>-->
+		
+	<!--<property name="help.doc.url.base" value="https://github.com/openETCS/governance"/>-->
+	<!--<property name="wiki.url.base" value="${help.doc.url.base}/OpenETCS_toolchain"/>-->
+		
+	<!--<property name="help.doc.url.base" value="https://wiki.eclipse.org"/>-->
+	<!--<property name="wiki.url.base" value="${help.doc.url.base}/OpenETCS_toolchain"/>-->
+	
+	<!--<property name="help.doc.url.base" value="https://github.com/openETCS/toolchain/wiki/"/>
+	<property name="wiki.url.base" value="${help.doc.url.base}/Documentation"/>-->
+	
+	<!--<property name="help.doc.url.base" value="http://meta.wikimedia.org/wiki"/>
+	<property name="wiki.url.base" value="${help.doc.url.base}/Help:Contents"/>-->
+		
+	<property name="imageFolder" value="images"/>
+	
+	<path id="wikitext.tasks.classpath">
+		<fileset dir="lib">
+			<include name="org.eclipse.mylyn.wikitext.*core*.jar"/>
+			<include name="org.eclipse.mylyn.wikitext.textile.*core*.jar"/>
+		</fileset>
+	</path>
+
+	<taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/internal/wikitext/mediawiki/core/tasks/tasks.properties"/>
+	<taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/wikitext/core/util/anttask/tasks.properties"/>
+	
+	
+	<target name="init">
+		<mkdir dir="tmp"/>
+	</target>
+
+	<target name="clean" depends="init">
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="tmp"/>
+		</delete>
+	</target>
+
+	<target name="all" depends="generate-help"/>
+	
+	<!--
+	<target name="generate-help" depends="init" description="Generate Eclipse help"> 
+		<mediawiki-to-eclipse-help 
+			title="OpenETCS Toolchain Documentation" 
+			generateUnifiedToc="false" 
+			dest="${basedir}" 
+			defaultAbsoluteLinkTarget="doc_external" 
+			formatoutput="true" 
+			prependImagePrefix="${imageFolder}" 
+			failonvalidationerror="true" 
+			validate="false" 
+			wikiBaseUrl="${help.doc.url.base}"> 
+			<path title="OpenETCS Toolchain Documentation" name="OpenETCS_toolchain" generateToc="true"/>
+			</mediawiki-to-eclipse-help> 
+	</target>
+	-->
+	
+	
+	<target name="generate-help" depends="init" description="Generate Eclipse help">
+			
+		<wikitext-to-eclipse-help markupLanguage="MediaWiki" 
+			multipleOutputFiles="true" 
+			navigationImages="true" 
+			helpPrefix="OpenETCS_toolchain"> 
+			<markupLanguageConfiguration escapingHtmlAndXml="true"/> 
+			<fileset dir="${basedir}/OpenETCS_toolchain"> 
+				<include name="*.mediawiki"/> 
+			</fileset> 
+			<stylesheet url="styles/main.css"/> 
+		</wikitext-to-eclipse-help>
+			
+	</target>
+		
+	<target name="generate-fo" depends="generate-help" description="Generate FO">
+		    	
+		<wikitext-to-xslfo  markupLanguage="MediaWiki" 
+			subtitle=" - OpenETCS Project -"
+			fontSize="12"
+			pageNumbering="true">
+	      <fileset dir="${basedir}/OpenETCS_toolchain">
+	       <include name="*.mediawiki"/>
+	      </fileset>
+	  	</wikitext-to-xslfo >
+		
+	</target>	
+	
+	<property name="imageFolder" value="images"/>
+	<property name="fop.home" value="${basedir}/fop-1.1"/>
+
+	<taskdef name="fop"
+		         classname="org.apache.fop.tools.anttasks.Fop">
+	<classpath>
+	    <fileset dir="${fop.home}/lib">
+	      <include name="*.jar"/>
+	    </fileset>
+	    <fileset dir="${fop.home}/build">
+	      <include name="fop.jar"/>
+	      <include name="fop-hyph.jar" />
+	    </fileset>
+	  </classpath>
+	</taskdef>
+	
+	<target name="generate-pdf" depends="generate-fo" description="Generates a single PDF file"> 
+	   <!--<fop format="application/pdf"
+	        fofile="${basedir}/OpenETCS_toolchain/OpenETCS_Toolchain_Documentation.fo"
+	        outfile="${basedir}/OpenETCS_toolchain/OpenETCS_Toolchain_Documentation.pdf" />-->
+			<fop format="application/pdf" outdir="${basedir}/pdf">
+				<fileset dir="${basedir}/OpenETCS_toolchain">
+					<include name="*.fo" />
+				</fileset>
+			</fop>
+	</target> 
+	
+	
+	
+	<!--
+	<property name="fop.home" value="${basedir}/fop-1.1"/>
+	<exec executable ="${fop.home}/fop.bat">
+		<arg value="${basedir}/OpenETCS_toolchain/*.fo"/>
+		<arg value="${basedir}/OpenETCS_toolchain/OpenETCS_Toolchain_Documentation.pdf"/>
+	</exec>-->
+	 
+	
+
+	<target name="test" depends="init" description="verify that all of the HTML files are well-formed XML">
+		<echo level="info">
+Validating help content XML and HTML files: The Eclipse help system expects well-formed XML
+
+If validation fails it is because either:
+
+* the userguide source code is poorly formed, or
+* the WikiText MediaWiki parser has a bug
+
+Problems with userguide source are usually caused by improper use of HTML markup in the MediaWiki source,
+or inadvertently starting a line with a space character (in MediaWiki this starts a preformatted block)
+		</echo>
+
+		<!--
+		Don't bother with DTD validation: we only care if the files are well-formed.
+		We therefore provide an empty DTD 
+		-->
+		<echo file="tmp/__empty.dtd" message=""/>
+		<xmlvalidate lenient="true">
+			<fileset dir="${basedir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.html"/>
+			</fileset>
+			<dtd publicid="-//W3C//DTD XHTML 1.0 Transitional//EN" location="${basedir}/tmp/__empty.dtd"/>
+		</xmlvalidate>
+	</target>
+
+</project>
